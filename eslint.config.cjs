@@ -36,6 +36,6 @@ module.exports = [
   prettierConfig,
 
   {
-    ignores: ["node_modules", "dist", "pnpm-lock.json", "eslint.config.cjs"],
+    ignores: ["node_modules", "dist", "pnpm-lock.json", "eslint.config.cjs", "test"],
   },
 ];
