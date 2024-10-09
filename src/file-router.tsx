@@ -1,58 +1,38 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { BrowserRouter, useRoutes } from "react-router-dom";
+import { getRoutes } from "./utils/get-routes";
 
-interface FileRouterProps {
-  loadingElement?: React.ReactNode;
-  errorElement?: React.ReactNode;
-}
-
-export function FileRouter({ loadingElement, errorElement }: FileRouterProps) {
-  const routes = getRoutes();
-
-  // 내부 컴포넌트에서 useRoutes 호출
-  function Routes() {
-    const element = useRoutes(routes);
-    return element;
-  }
-
+/**
+ * 폴더/파일 기반 라우터
+ * @example
+ * ```jsx
+ * // 엔트리 파일
+ * return <FileRouter />
+ * ```
+ */
+export function FileRouter() {
   return (
     <BrowserRouter>
-      <Suspense fallback={loadingElement || <div>Loading...</div>}>
-        <Routes />
-      </Suspense>
+      <Routes />
     </BrowserRouter>
   );
 }
 
-// 라우트 정보를 생성하는 함수
-function getRoutes() {
-  // Vite의 import.meta.glob을 사용하여 pages 디렉토리의 page.tsx 파일을 모두 가져옵니다.
-  const modules = import.meta.glob("/src/pages/**/page.{jsx,tsx}");
+function Routes() {
+  /**
+   * 파일/폴더 정보를 읽은 후 해당 라우터 정보를 모두 가져옵니다
+   */
+  const routes = getRoutes();
 
-  const routeObjects = Object.keys(modules).map((filePath) => {
-    const path = formatPath(filePath);
-    const element = React.lazy(modules[filePath] as any);
-
-    return {
-      path,
-      element: React.createElement(element),
-    };
-  });
-
-  return routeObjects;
-}
-
-// 파일 경로를 URL 경로로 변환하는 함수
-function formatPath(filePath: string): string {
-  // 예시: '/src/pages/test/page.tsx' -> '/test'
-  let path = filePath
-    .replace(/^\/src\/pages/, "") // '/test/page.tsx'
-    .replace(/\/page\.(jsx|tsx)$/, "") // '/test'
-    .replace(/\[([^\]]+)\]/g, ":$1"); // 동적 라우트 처리
-
-  if (path === "") {
-    path = "/";
-  }
-
-  return path;
+  /**
+   * `useRoutes` 훅은 주어진 라우트 설정을 기반으로 해당 경로에 매칭되는 컴포넌트를 렌더링합니다.
+   *
+   * @function useRoutes
+   * @param {RouteObject[]} routes - 각 경로와 해당 컴포넌트를 정의한 라우트 객체 배열입니다.
+   *
+   * @returns {React.ReactElement | null} - 매칭되는 경로가 있으면 해당 경로의 컴포넌트(React 엘리먼트)를 반환하고,
+   *                                        매칭되는 경로가 없으면 null을 반환합니다.
+   */
+  const element = useRoutes(routes);
+  return element;
 }
