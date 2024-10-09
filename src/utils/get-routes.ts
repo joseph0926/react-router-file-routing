@@ -1,6 +1,6 @@
-import React from "react";
-import { formatPath } from "./format-path";
-import { RouteObject } from "react-router-dom";
+import React from 'react';
+import { formatPath } from './format-path';
+import { RouteObject } from 'react-router-dom';
 
 /**
  * 파일/폴더를 읽고 해당하는 라우터를 모두 가져오는 함수입니다
@@ -23,7 +23,7 @@ export function getRoutes() {
    * }
    * ```
    */
-  const modules = import.meta.glob("/src/pages/**/page.{jsx,tsx}");
+  const modules = import.meta.glob('/src/pages/**/page.{jsx,tsx}');
 
   /**
    * `react-router`에 주입할 `routeObject`를 생성합니다

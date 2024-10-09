@@ -1,6 +1,6 @@
-import React from "react";
-import { BrowserRouter, useRoutes } from "react-router-dom";
-import { getRoutes } from "./utils/get-routes";
+import React from 'react';
+import { BrowserRouter, useRoutes } from 'react-router-dom';
+import { getRoutes } from './utils/get-routes';
 
 /**
  * 폴더/파일 기반 라우터
