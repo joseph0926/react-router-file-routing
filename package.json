@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint",
+    "format": "prettier --w 'src/**/*.{ts,tsx,js,jsx,json,css,md}'"
   },
   "keywords": [],
   "author": "",
