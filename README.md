@@ -8,20 +8,20 @@
 
 ### **🛠 설치 방법**
 
-프로젝트에서 사용하기 위해서는 아래 명령어로 라이브러리를 설치할 수 있습니다.
+먼저, 라이브러리를 설치하기 전에 **반드시** `react-router-dom`과 `vite`가 설치되어 있어야 합니다.
 
 ```bash
 npm install react-router-file-routing react-router-dom
 npm install -D vite
 ```
 
-**반드시 `react-router-dom`, `vite`이 설치되어있어야합니다.**
-
 ---
 
 ### **🚀 사용 방법**
 
 #### **1. 기본 폴더 구조**
+
+경로에 맞게 **반드시** `src/pages/<경로명>/page.tsx` 형태의 파일 구조를 유지해야 합니다. 이 파일은 **default export**가 필수입니다.
 
 ```plaintext
 src/
@@ -55,7 +55,7 @@ function App() {
 export default App;
 ```
 
-#### **3. 동적 라우트**
+#### **3. 동적 라우트 (예정)**
 
 폴더명에 **대괄호([ ])**를 사용하여 동적 라우트를 정의할 수 있습니다. 예를 들어, `[postId]`라는 폴더명은 `/blog/:postId` 경로로 해석됩니다.
 
