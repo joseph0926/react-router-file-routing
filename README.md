@@ -55,7 +55,7 @@ function App() {
 export default App;
 ```
 
-#### **3. 동적 라우트 (예정)**
+#### **3. 동적 라우트**
 
 폴더명에 **대괄호([ ])**를 사용하여 동적 라우트를 정의할 수 있습니다. 예를 들어, `[postId]`라는 폴더명은 `/blog/:postId` 경로로 해석됩니다.
 
@@ -69,6 +69,44 @@ export default function BlogPostPage() {
   return <h1>Blog Post: {postId}</h1>;
 }
 ```
+
+다음은 개선된 **All Catch Router**에 대한 리드미입니다.
+
+---
+
+#### **All Catch Router**
+
+폴더명에 **대괄호([ ])**와 **...**을 조합하여 **Catch-all 라우트**를 정의할 수 있습니다. 예를 들어, `/blog/[...slug]`라는 폴더명은 **React Router**에서 `/blog/*` 경로로 해석됩니다. 이 라우트는 여러 개의 경로 세그먼트를 포괄할 수 있으며, 다양한 깊이의 경로를 동일한 컴포넌트로 처리할 수 있습니다.
+
+즉, `/blog/1`, `/blog/1/2`, `/blog/1/2/3` 등 모든 조합의 경로가 해당 `page.tsx`로 렌더링됩니다.
+
+> **주의**: All Catch Router는 명시된 경로보다 우선순위가 낮습니다. 즉, 다른 명시적인 경로가 먼저 처리되고, 해당 경로가 없을 경우 All Catch Router가 처리됩니다.
+
+```tsx
+// src/pages/blog/[...slug]/page.tsx
+import React from 'react';
+import { useParams } from 'react-router-dom';
+
+export default function BlogCatchAllPage() {
+  const params = useParams<{ '*': string }>(); // 와일드카드 매칭된 경로
+  const slug = params['*'] ? params['*'].split('/') : []; // 슬래시로 분리된 경로 세그먼트 배열
+
+  return (
+    <div>
+      <h1>Blog Catch-All Page</h1>
+      <p>Current Slug: {JSON.stringify(slug)}</p>
+    </div>
+  );
+}
+```
+
+##### 사용 예시
+
+- `/blog/1`로 접근 시, `slug`는 `['1']`이 됩니다.
+- `/blog/1/2`로 접근 시, `slug`는 `['1', '2']`가 됩니다.
+- `/blog/1/2/3`로 접근 시, `slug`는 `['1', '2', '3']`이 됩니다.
+
+**Catch-all 라우트**를 통해 여러 단계의 경로를 하나의 컴포넌트에서 쉽게 관리할 수 있으며, 다양한 세그먼트를 동적으로 처리할 수 있습니다.
 
 #### **4. 레이아웃 지원 (예정)**
 
