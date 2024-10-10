@@ -11,7 +11,8 @@ export function formatPath(filePath: string): string {
     .replace(/\/page\.(jsx|tsx)$/, '') // 폴더 경로에서 page.tsx or page.jsx 제거
     .replace(/\/layout\.(jsx|tsx)$/, '') // 폴더 경로에서 layout.tsx or layout.jsx 제거
     .replace(/\[\.{3}(\w+)\]/g, '*') // '[...segment]' -> '*'로 변환
-    .replace(/\[([^\]]+)\]/g, ':$1'); // [id] -> :id 로 변환
+    .replace(/\[([^\]]+)\]/g, ':$1') // [id] -> :id 로 변환
+    .replace(/\/\([^\)]+\)/g, ''); // '(폴더명)'을 제거
 
   if (path === '') {
     path = '/';

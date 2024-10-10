@@ -1,6 +1,7 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import { formatPath } from './format-path';
+import { sortRoutes } from './sort-routes';
 
 /**
  * 파일/폴더를 읽고 해당하는 라우터를 모두 가져오는 함수입니다
@@ -52,7 +53,7 @@ export function getRoutes(): RouteObject[] {
   const routeMap: Record<
     string,
     {
-      path: string;
+      path?: string; // 그룹 라우터(path-less route를 위한 path 옵셔널)
       layoutElement?: React.LazyExoticComponent<any>;
       pageElement?: React.LazyExoticComponent<any>;
     }
@@ -66,7 +67,10 @@ export function getRoutes(): RouteObject[] {
     const element = React.lazy(modules[filePath] as any);
 
     if (!routeMap[path]) {
-      routeMap[path] = { path };
+      routeMap[path] = {};
+    }
+    if (path && path !== '') {
+      routeMap[path].path = path;
     }
     routeMap[path].pageElement = element;
   });
@@ -77,78 +81,63 @@ export function getRoutes(): RouteObject[] {
     const element = React.lazy(layouts[filePath] as any);
 
     if (!routeMap[path]) {
-      routeMap[path] = { path };
+      routeMap[path] = {};
+    }
+    if (path && path !== '') {
+      routeMap[path].path = path;
     }
     routeMap[path].layoutElement = element;
   });
 
   /** routeMap을 기반으로 RouteObject 배열 생성  */
   const routeObjects: RouteObject[] = Object.values(routeMap).map((route) => {
+    const routeObject: RouteObject = {};
+
+    /** path가 있으면 설정 */
+    if (route.path) {
+      routeObject.path = route.path;
+    }
+
     /** 레이아웃과 페이지 모두 있는 경우 */
     if (route.layoutElement && route.pageElement) {
-      return {
-        path: route.path,
-        element: React.createElement(
-          React.Suspense,
-          { fallback: null },
-          React.createElement(route.layoutElement),
-        ),
-        children: [
-          {
-            index: true,
-            element: React.createElement(
-              React.Suspense,
-              { fallback: null },
-              React.createElement(route.pageElement),
-            ),
-          },
-        ],
-      };
+      routeObject.element = React.createElement(
+        React.Suspense,
+        { fallback: null },
+        React.createElement(route.layoutElement),
+      );
+      routeObject.children = [
+        {
+          index: true,
+          element: React.createElement(
+            React.Suspense,
+            { fallback: null },
+            React.createElement(route.pageElement),
+          ),
+        },
+      ];
     } else if (route.layoutElement) {
-    /** 레이아웃만 있는 경우 */
-      return {
-        path: route.path,
-        element: React.createElement(
-          React.Suspense,
-          { fallback: null },
-          React.createElement(route.layoutElement),
-        ),
-      };
+      /** 레이아웃만 있는 경우 */
+      routeObject.element = React.createElement(
+        React.Suspense,
+        { fallback: null },
+        React.createElement(route.layoutElement),
+      );
     } else if (route.pageElement) {
-    /** 페이지만 있는 경우 */
-      return {
-        path: route.path,
-        element: React.createElement(
-          React.Suspense,
-          { fallback: null },
-          React.createElement(route.pageElement),
-        ),
-      };
+      /** 페이지만 있는 경우 */
+      routeObject.element = React.createElement(
+        React.Suspense,
+        { fallback: null },
+        React.createElement(route.pageElement),
+      );
     } else {
-    /** 해당 경로에 레이아웃이나 페이지가 없는 경우 */
-      return {
-        path: route.path,
-        element: null,
-      };
+      /** 해당 경로에 레이아웃이나 페이지가 없는 경우 */
+      routeObject.element = null;
     }
+
+    return routeObject;
   });
 
-  /** 라우터 우선순위 설정
-   * - 명시된 라우터 > 동적 라우터
-   */
-  routeObjects.sort((a, b) => {
-    const aPath = a.path ?? '';
-    const bPath = b.path ?? '';
-
-    const aDynamic = aPath.includes(':') || aPath.includes('*');
-    const bDynamic = bPath.includes(':') || bPath.includes('*');
-
-    if (aDynamic && !bDynamic) return 1;
-    if (!aDynamic && bDynamic) return -1;
-    if (aPath === '*') return 1;
-    if (bPath === '*') return -1;
-    return aPath.length - bPath.length;
-  });
+  sortRoutes(routeObjects);
 
   return routeObjects;
 }
