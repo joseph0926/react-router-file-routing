@@ -44,12 +44,17 @@ export function getRoutes(): RouteObject[] {
         element: React.createElement(element),
       };
     })
+    /** 라우터 우선순위 설정
+     * - 명시된 라우터 > 동적 라우터
+     */
     .sort((a, b) => {
-      const aDynamic = a.path.includes(':');
-      const bDynamic = b.path.includes(':');
+      const aDynamic = a.path.includes(':') || a.path.includes('*');
+      const bDynamic = b.path.includes(':') || b.path.includes('*');
 
       if (aDynamic && !bDynamic) return 1;
       if (!aDynamic && bDynamic) return -1;
+      if (a.path === '*') return 1;
+      if (b.path === '*') return -1;
       return a.path.length - b.path.length;
     });
 
