@@ -24,39 +24,131 @@ export function getRoutes(): RouteObject[] {
    * ```
    */
   const modules = import.meta.glob('/src/pages/**/page.{jsx,tsx}');
-
   /**
-   * `react-router`에 주입할 `routeObject`를 생성합니다
-   * @returns
+   * pages 디렉토리의 layout.tsx 파일을 모두 가져옵니다.
+   * @example
    * ```js
-   * { path: '/<path>', element: <Component /> }
+   * {
+   *  '/src/pages/home/layout.tsx': () => import('/src/pages/home/layout.tsx'),
+   *  '/src/pages/about/layout.tsx': () => import('/src/pages/about/layout.tsx'),
+   * }
    * ```
    */
-  const routeObjects: RouteObject[] = Object.keys(modules)
-    .map((filePath) => {
-      /** modules의 key값인 파일/폴더 경로를 가져온 후 포멧하여 `path`로 설정합니다 */
-      const path = formatPath(filePath);
-      /** key값에 해당하는 `import`문을 가져와서 `lazy` 로드를 통해 엘리먼트로 반환합니다 */
-      const element = React.lazy(modules[filePath] as any);
+  const layouts = import.meta.glob('/src/pages/**/layout.{jsx,tsx}');
 
+  /**
+   * 경로별로 레이아웃과 페이지를 매핑하기 위한 객체
+   * @example
+   * ```js
+   * {
+   *   [formattedPath]: {
+   *     path: string;
+   *     layoutElement?: React.LazyExoticComponent<any>;
+   *     pageElement?: React.LazyExoticComponent<any>;
+   *   }
+   * }
+   * ```
+   */
+  const routeMap: Record<
+    string,
+    {
+      path: string;
+      layoutElement?: React.LazyExoticComponent<any>;
+      pageElement?: React.LazyExoticComponent<any>;
+    }
+  > = {};
+
+  /** 모든 page.tsx 파일을 순회하여 routeMap에 추가 */
+  Object.keys(modules).map((filePath) => {
+    /** modules의 key값인 파일/폴더 경로를 가져온 후 포멧하여 `path`로 설정합니다 */
+    const path = formatPath(filePath);
+    /** key값에 해당하는 `import`문을 가져와서 `lazy` 로드를 통해 엘리먼트로 반환합니다 */
+    const element = React.lazy(modules[filePath] as any);
+
+    if (!routeMap[path]) {
+      routeMap[path] = { path };
+    }
+    routeMap[path].pageElement = element;
+  });
+
+  /** 모든 layout.tsx 파일을 순회하여 routeMap에 추가 */
+  Object.keys(layouts).forEach((filePath) => {
+    const path = formatPath(filePath);
+    const element = React.lazy(layouts[filePath] as any);
+
+    if (!routeMap[path]) {
+      routeMap[path] = { path };
+    }
+    routeMap[path].layoutElement = element;
+  });
+
+  /** routeMap을 기반으로 RouteObject 배열 생성  */
+  const routeObjects: RouteObject[] = Object.values(routeMap).map((route) => {
+    /** 레이아웃과 페이지 모두 있는 경우 */
+    if (route.layoutElement && route.pageElement) {
       return {
-        path,
-        element: React.createElement(element),
+        path: route.path,
+        element: React.createElement(
+          React.Suspense,
+          { fallback: null },
+          React.createElement(route.layoutElement),
+        ),
+        children: [
+          {
+            index: true,
+            element: React.createElement(
+              React.Suspense,
+              { fallback: null },
+              React.createElement(route.pageElement),
+            ),
+          },
+        ],
       };
-    })
-    /** 라우터 우선순위 설정
-     * - 명시된 라우터 > 동적 라우터
-     */
-    .sort((a, b) => {
-      const aDynamic = a.path.includes(':') || a.path.includes('*');
-      const bDynamic = b.path.includes(':') || b.path.includes('*');
+    } else if (route.layoutElement) {
+    /** 레이아웃만 있는 경우 */
+      return {
+        path: route.path,
+        element: React.createElement(
+          React.Suspense,
+          { fallback: null },
+          React.createElement(route.layoutElement),
+        ),
+      };
+    } else if (route.pageElement) {
+    /** 페이지만 있는 경우 */
+      return {
+        path: route.path,
+        element: React.createElement(
+          React.Suspense,
+          { fallback: null },
+          React.createElement(route.pageElement),
+        ),
+      };
+    } else {
+    /** 해당 경로에 레이아웃이나 페이지가 없는 경우 */
+      return {
+        path: route.path,
+        element: null,
+      };
+    }
+  });
 
-      if (aDynamic && !bDynamic) return 1;
-      if (!aDynamic && bDynamic) return -1;
-      if (a.path === '*') return 1;
-      if (b.path === '*') return -1;
-      return a.path.length - b.path.length;
-    });
+  /** 라우터 우선순위 설정
+   * - 명시된 라우터 > 동적 라우터
+   */
+  routeObjects.sort((a, b) => {
+    const aPath = a.path ?? '';
+    const bPath = b.path ?? '';
+
+    const aDynamic = aPath.includes(':') || aPath.includes('*');
+    const bDynamic = bPath.includes(':') || bPath.includes('*');
+
+    if (aDynamic && !bDynamic) return 1;
+    if (!aDynamic && bDynamic) return -1;
+    if (aPath === '*') return 1;
+    if (bPath === '*') return -1;
+    return aPath.length - bPath.length;
+  });
 
   return routeObjects;
 }
