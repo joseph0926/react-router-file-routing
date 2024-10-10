@@ -125,6 +125,17 @@ export default function DashboardLayout() {
 }
 ```
 
+#### **5. 그룹 라우팅 지원**
+
+`(폴더명)` 형태의 그룹 라우터 (또는 pathless 라우터)를 정의할 수 있습니다.
+
+- Ex.1
+  - 폴더: /pages/(root)/page.tsx, layout.tsx
+  - 경로: "/"
+- Ex.2
+  - 폴더: /pages/home/(auth)/layout.tsx,page.tsx
+  - 경로: "/home"
+
 ---
 
 ### **📄 기여 방법**
