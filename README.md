@@ -70,8 +70,6 @@ export default function BlogPostPage() {
 }
 ```
 
-다음은 개선된 **All Catch Router**에 대한 리드미입니다.
-
 ---
 
 #### **All Catch Router**
