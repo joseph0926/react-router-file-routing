@@ -9,6 +9,7 @@ export function formatPath(filePath: string): string {
   let path = normalizedPath
     .replace(/^\/src\/pages/, '') // 폴더 경로에서 `path`에 포함되지 않을 부분 제거
     .replace(/\/page\.(jsx|tsx)$/, '') // 폴더 경로에서 page.tsx or page.jsx 제거
+    .replace(/\[\.{3}(\w+)\]/g, '*') // '[...segment]' -> '*'로 변환
     .replace(/\[([^\]]+)\]/g, ':$1'); // [id] -> :id 로 변환
 
   if (path === '') {
