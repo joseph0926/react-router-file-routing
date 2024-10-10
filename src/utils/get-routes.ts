@@ -1,17 +1,13 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
-import { formatPath } from './format-path';
 import { sortRoutes } from './sort-routes';
+import { RouteNode } from '../types';
+import { getPathSegments } from './get-path-segments';
+import { addToRouteTree } from './add-tree';
+import { buildRoutesFromTree } from './build-tree';
 
 /**
  * 파일/폴더를 읽고 해당하는 라우터를 모두 가져오는 함수입니다
- * @returns 
- * ```ts
- * {
-      path: string;
-      element: React.FunctionComponentElement<any>;
-    }[]
- * ```
  */
 export function getRoutes(): RouteObject[] {
   /**
@@ -37,106 +33,34 @@ export function getRoutes(): RouteObject[] {
    */
   const layouts = import.meta.glob('/src/pages/**/layout.{jsx,tsx}');
 
-  /**
-   * 경로별로 레이아웃과 페이지를 매핑하기 위한 객체
-   * @example
-   * ```js
-   * {
-   *   [formattedPath]: {
-   *     path: string;
-   *     layoutElement?: React.LazyExoticComponent<any>;
-   *     pageElement?: React.LazyExoticComponent<any>;
-   *   }
-   * }
-   * ```
-   */
-  const routeMap: Record<
-    string,
-    {
-      path?: string; // 그룹 라우터(path-less route를 위한 path 옵셔널)
-      layoutElement?: React.LazyExoticComponent<any>;
-      pageElement?: React.LazyExoticComponent<any>;
-    }
-  > = {};
+  /** 트리 구조를 생성하기 위한 루트 노드 */
+  const routeTree: RouteNode = {};
 
-  /** 모든 page.tsx 파일을 순회하여 routeMap에 추가 */
-  Object.keys(modules).map((filePath) => {
-    /** modules의 key값인 파일/폴더 경로를 가져온 후 포멧하여 `path`로 설정합니다 */
-    const path = formatPath(filePath);
-    /** key값에 해당하는 `import`문을 가져와서 `lazy` 로드를 통해 엘리먼트로 반환합니다 */
+  /** 모든 page.tsx 파일을 순회하여 트리 구조에 추가 */
+  Object.keys(modules).forEach((filePath) => {
+    const pathSegments = getPathSegments(filePath);
     const element = React.lazy(modules[filePath] as any);
 
-    if (!routeMap[path]) {
-      routeMap[path] = {};
-    }
-    if (path && path !== '') {
-      routeMap[path].path = path;
-    }
-    routeMap[path].pageElement = element;
+    addToRouteTree(routeTree, pathSegments, {
+      type: 'page',
+      element,
+    });
   });
 
-  /** 모든 layout.tsx 파일을 순회하여 routeMap에 추가 */
+  /** 모든 layout.tsx 파일을 순회하여 트리 구조에 추가 */
   Object.keys(layouts).forEach((filePath) => {
-    const path = formatPath(filePath);
+    const pathSegments = getPathSegments(filePath);
     const element = React.lazy(layouts[filePath] as any);
 
-    if (!routeMap[path]) {
-      routeMap[path] = {};
-    }
-    if (path && path !== '') {
-      routeMap[path].path = path;
-    }
-    routeMap[path].layoutElement = element;
+    addToRouteTree(routeTree, pathSegments, {
+      type: 'layout',
+      element,
+    });
   });
+  /** 트리 구조를 기반으로 RouteObject 배열 생성 */
+  const routeObjects = buildRoutesFromTree(routeTree);
 
-  /** routeMap을 기반으로 RouteObject 배열 생성  */
-  const routeObjects: RouteObject[] = Object.values(routeMap).map((route) => {
-    const routeObject: RouteObject = {};
-
-    /** path가 있으면 설정 */
-    if (route.path) {
-      routeObject.path = route.path;
-    }
-
-    /** 레이아웃과 페이지 모두 있는 경우 */
-    if (route.layoutElement && route.pageElement) {
-      routeObject.element = React.createElement(
-        React.Suspense,
-        { fallback: null },
-        React.createElement(route.layoutElement),
-      );
-      routeObject.children = [
-        {
-          index: true,
-          element: React.createElement(
-            React.Suspense,
-            { fallback: null },
-            React.createElement(route.pageElement),
-          ),
-        },
-      ];
-    } else if (route.layoutElement) {
-      /** 레이아웃만 있는 경우 */
-      routeObject.element = React.createElement(
-        React.Suspense,
-        { fallback: null },
-        React.createElement(route.layoutElement),
-      );
-    } else if (route.pageElement) {
-      /** 페이지만 있는 경우 */
-      routeObject.element = React.createElement(
-        React.Suspense,
-        { fallback: null },
-        React.createElement(route.pageElement),
-      );
-    } else {
-      /** 해당 경로에 레이아웃이나 페이지가 없는 경우 */
-      routeObject.element = null;
-    }
-
-    return routeObject;
-  });
-
+  /** 우선순위 정렬 */
   sortRoutes(routeObjects);
 
   return routeObjects;
