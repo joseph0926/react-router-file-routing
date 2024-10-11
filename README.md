@@ -1,14 +1,14 @@
 # **📦 react-router-file-routing**
 
-### **폴더/파일 기반 라우팅을 지원하는 React Router 확장 라이브러리**
+### **A React Router Extension Supporting Folder/File-Based Routing**
 
-`react-router-file-routing`은 **Next.js**의 App Router와 유사하게, 폴더/파일 구조에 기반한 라우팅을 지원하는 **React Router DOM** 기반의 확장 라이브러리입니다. 각 폴더에 `page.tsx` 파일을 두어 경로를 생성하고, 동적 라우트와 중첩 라우트도 손쉽게 관리할 수 있습니다.
+`react-router-file-routing` is an extension of **React Router DOM** that supports folder/file-based routing, similar to the App Router in **Next.js**. It automatically generates routes based on folder structures with `page.tsx` files and allows easy management of dynamic and nested routes.
 
 ---
 
-### **🛠 설치 방법**
+### **🛠 Installation**
 
-먼저, 라이브러리를 설치하기 전에 **반드시** `react-router-dom`과 `vite`가 설치되어 있어야 합니다.
+Before installing this library, make sure that **react-router-dom** and **vite** are already installed.
 
 ```bash
 npm install react-router-file-routing react-router-dom
@@ -17,31 +17,31 @@ npm install -D vite
 
 ---
 
-### **🚀 사용 방법**
+### **🚀 Usage**
 
-#### **1. 기본 폴더 구조**
+#### **1. Basic Folder Structure**
 
-경로에 맞게 **반드시** `src/pages/<경로명>/page.tsx` 형태의 파일 구조를 유지해야 합니다. 이 파일은 **default export**가 필수입니다.
+You must maintain the file structure in the format of `src/pages/<route-name>/page.tsx` to match the route. Each `page.tsx` file must have a **default export**.
 
 ```plaintext
 src/
 ├── pages/
-│   ├── index.tsx          // '/' 경로에 해당
+│   ├── index.tsx          // corresponds to the '/' route
 │   ├── about/
-│   │   └── page.tsx       // '/about' 경로에 해당
+│   │   └── page.tsx       // corresponds to the '/about' route
 │   ├── blog/
-│   │   ├── page.tsx       // '/blog' 경로에 해당
+│   │   ├── page.tsx       // corresponds to the '/blog' route
 │   │   └── [postId]/
-│   │       └── page.tsx   // '/blog/:postId' 동적 경로에 해당
+│   │       └── page.tsx   // corresponds to the '/blog/:postId' dynamic route
 │   └── dashboard/
-│       ├── page.tsx       // '/dashboard' 경로에 해당
+│       ├── page.tsx       // corresponds to the '/dashboard' route
 │       └── settings/
-│           └── page.tsx   // '/dashboard/settings' 경로에 해당
+│           └── page.tsx   // corresponds to the '/dashboard/settings' route
 ```
 
-#### **2. `FileRouter` 컴포넌트 사용**
+#### **2. Using the `FileRouter` Component**
 
-`FileRouter` 컴포넌트는 프로젝트 내의 **폴더 기반 라우팅**을 쉽게 구현할 수 있도록 도와줍니다. 사용자는 `pages` 디렉토리 구조에 맞춰 파일을 작성하기만 하면 라우팅이 자동으로 처리됩니다.
+The `FileRouter` component helps implement **folder-based routing** easily. By simply writing files according to the `pages` directory structure, routing will be handled automatically.
 
 ```tsx
 // src/App.tsx
@@ -55,9 +55,9 @@ function App() {
 export default App;
 ```
 
-#### **3. 동적 라우트**
+#### **3. Dynamic Routes**
 
-폴더명에 **대괄호([ ])**를 사용하여 동적 라우트를 정의할 수 있습니다. 예를 들어, `[postId]`라는 폴더명은 `/blog/:postId` 경로로 해석됩니다.
+Use **brackets ([ ])** in folder names to define dynamic routes. For example, a folder named `[postId]` will be interpreted as the route `/blog/:postId`.
 
 ```tsx
 // src/pages/blog/[postId]/page.tsx
@@ -74,11 +74,11 @@ export default function BlogPostPage() {
 
 #### **All Catch Router**
 
-폴더명에 **대괄호([ ])**와 **...**을 조합하여 **Catch-all 라우트**를 정의할 수 있습니다. 예를 들어, `/blog/[...slug]`라는 폴더명은 **React Router**에서 `/blog/*` 경로로 해석됩니다. 이 라우트는 여러 개의 경로 세그먼트를 포괄할 수 있으며, 다양한 깊이의 경로를 동일한 컴포넌트로 처리할 수 있습니다.
+You can define a **Catch-all route** by combining brackets ([ ]) and **...** in folder names. For example, the folder `/blog/[...slug]` will be interpreted as `/blog/*` in **React Router**, and it will match multiple path segments.
 
-즉, `/blog/1`, `/blog/1/2`, `/blog/1/2/3` 등 모든 조합의 경로가 해당 `page.tsx`로 렌더링됩니다.
+Thus, paths like `/blog/1`, `/blog/1/2`, `/blog/1/2/3`, etc., will all render the same `page.tsx`.
 
-> **주의**: All Catch Router는 명시된 경로보다 우선순위가 낮습니다. 즉, 다른 명시적인 경로가 먼저 처리되고, 해당 경로가 없을 경우 All Catch Router가 처리됩니다.
+> **Note**: All Catch Routers have a lower priority than explicitly defined routes. This means that specific routes will be handled first, and the Catch-all route will handle any unmatched paths.
 
 ```tsx
 // src/pages/blog/[...slug]/page.tsx
@@ -86,8 +86,8 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 export default function BlogCatchAllPage() {
-  const params = useParams<{ '*': string }>(); // 와일드카드 매칭된 경로
-  const slug = params['*'] ? params['*'].split('/') : []; // 슬래시로 분리된 경로 세그먼트 배열
+  const params = useParams<{ '*': string }>(); // wildcard matched route
+  const slug = params['*'] ? params['*'].split('/') : []; // array of path segments
 
   return (
     <div>
@@ -98,17 +98,17 @@ export default function BlogCatchAllPage() {
 }
 ```
 
-##### 사용 예시
+##### Usage Examples
 
-- `/blog/1`로 접근 시, `slug`는 `['1']`이 됩니다.
-- `/blog/1/2`로 접근 시, `slug`는 `['1', '2']`가 됩니다.
-- `/blog/1/2/3`로 접근 시, `slug`는 `['1', '2', '3']`이 됩니다.
+- Accessing `/blog/1` will result in `slug = ['1']`.
+- Accessing `/blog/1/2` will result in `slug = ['1', '2']`.
+- Accessing `/blog/1/2/3` will result in `slug = ['1', '2', '3']`.
 
-**Catch-all 라우트**를 통해 여러 단계의 경로를 하나의 컴포넌트에서 쉽게 관리할 수 있으며, 다양한 세그먼트를 동적으로 처리할 수 있습니다.
+With **Catch-all routes**, you can manage multiple levels of paths with a single component and dynamically handle different segments.
 
-#### **4. 레이아웃 지원**
+#### **4. Layout Support**
 
-폴더 내에 `layout.tsx` 파일을 추가하여 해당 경로에 **레이아웃**을 적용할 수 있습니다. 레이아웃을 사용하면 중첩된 경로에 동일한 레이아웃을 적용할 수 있습니다.
+You can add a `layout.tsx` file inside a folder to apply a **layout** to the corresponding route. Layouts allow you to apply the same structure to nested routes.
 
 ```tsx
 // src/pages/dashboard/layout.tsx
@@ -125,46 +125,46 @@ export default function DashboardLayout() {
 }
 ```
 
-#### **5. 그룹 라우팅 지원**
+#### **5. Group Routing Support**
 
-`(폴더명)` 형태의 그룹 라우터 (또는 pathless 라우터)를 정의할 수 있습니다.
+You can define a group route (or pathless route) using `(folder-name)` format.
 
 - Ex.1
-  - 폴더: /pages/(root)/page.tsx, layout.tsx
-  - 경로: "/"
+  - Folder: /pages/(root)/page.tsx, layout.tsx
+  - Path: "/"
 - Ex.2
-  - 폴더: /pages/home/(auth)/layout.tsx,page.tsx
-  - 경로: "/home"
+  - Folder: /pages/home/(auth)/layout.tsx,page.tsx
+  - Path: "/home"
 
 ---
 
-### **📄 기여 방법**
+### **📄 How to Contribute**
 
-이 프로젝트에 기여하고 싶으시다면, 다음 절차를 따라주세요:
+If you want to contribute to this project, follow these steps:
 
-1. 이 저장소를 **포크**합니다.
-2. 새로운 **브랜치**를 생성합니다 (`git checkout -b feature/my-feature`).
-3. 변경 사항을 **커밋**합니다 (`git commit -m 'Add some feature'`).
-4. **푸시**합니다 (`git push origin feature/my-feature`).
-5. **Pull Request**를 만듭니다.
-
----
-
-### **📝 라이선스**
-
-이 프로젝트는 [MIT 라이선스](LICENSE)에 따라 라이선스가 부여됩니다.
+1. **Fork** the repository.
+2. Create a new **branch** (`git checkout -b feature/my-feature`).
+3. **Commit** your changes (`git commit -m 'Add some feature'`).
+4. **Push** to the branch (`git push origin feature/my-feature`).
+5. Create a **Pull Request**.
 
 ---
 
-### **🔗 관련 링크**
+### **📝 License**
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+### **🔗 Related Links**
 
 - **React Router**: [https://reactrouter.com](https://reactrouter.com)
 - **Next.js**: [https://nextjs.org](https://nextjs.org)
 
 ---
 
-### **📧 문의**
+### **📧 Contact**
 
-궁금한 점이나 문제가 있다면 아래로 문의해 주세요
+If you have any questions or issues, feel free to contact me at:
 
 - **Email**: rkekqmf0926@gmail.com
