@@ -28,7 +28,7 @@ You must maintain the file structure in the format of `src/pages/<route-name>/pa
 ```plaintext
 src/
 ├── pages/
-│   ├── index.tsx          // corresponds to the '/' route
+│   ├── page.tsx          // corresponds to the '/' route
 │   ├── about/
 │   │   └── page.tsx       // corresponds to the '/about' route
 │   ├── blog/
