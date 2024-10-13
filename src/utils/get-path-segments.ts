@@ -17,7 +17,13 @@ export function getPathSegments(filePath: string): string[] {
         return '';
       }
       return segment;
-    });
+    })
+    .filter((segment) => segment !== '');
+
+  /** 메인 진입점 처리 (`/pages/page.tsx` || `/pages/layout.tsx`) */
+  if (segments[0].startsWith('page.') || segments[0].startsWith('layout.')) {
+    segments[0] = '/';
+  }
 
   /** 파일 이름을 제거 */
   if (

@@ -12,6 +12,53 @@ export function buildRoutesFromTree(
   node: RouteNode,
   parentPath = '',
 ): RouteObject[] {
+  /** 루트 노드이고 레이아웃 요소가 있는 경우 */
+  if (parentPath === '' && node.layoutElement) {
+    const rootRoute: RouteObject = {
+      path: '/',
+      element: React.createElement(
+        React.Suspense,
+        { fallback: null },
+        React.createElement(node.layoutElement),
+      ),
+      children: [],
+    };
+
+    const childRoutes: RouteObject[] = [];
+
+    /** 루트 노드에 페이지 요소가 있는 경우 인덱스 라우트로 추가 */
+    if (node.pageElement) {
+      const pageElement = React.createElement(
+        React.Suspense,
+        { fallback: null },
+        React.createElement(node.pageElement),
+      );
+
+      childRoutes.push({
+        index: true,
+        element: pageElement,
+      });
+    }
+
+    /** 자식 노드를 재귀적으로 처리 */
+    if (node.children) {
+      for (const childSegment in node.children) {
+        const childNode = node.children[childSegment];
+        const childRoutesFromNode = buildRoutesFromTree(
+          childNode,
+          childSegment,
+        );
+        childRoutes.push(...childRoutesFromNode);
+      }
+    }
+
+    /** 자식 라우트를 루트 라우트의 children에 추가 */
+    rootRoute.children = childRoutes;
+
+    /** 루트 라우트만 반환하여 모든 경로에 루트 레이아웃이 적용되도록 함 */
+    return [rootRoute];
+  }
+
   const routes: RouteObject[] = [];
 
   const route: RouteObject = {};
@@ -59,12 +106,7 @@ export function buildRoutesFromTree(
 
     for (const childSegment in node.children) {
       const childNode = node.children[childSegment];
-      const childRoutePath = childSegment; // 경로 세그먼트
-
-      const childRoutesFromNode = buildRoutesFromTree(
-        childNode,
-        childRoutePath,
-      );
+      const childRoutesFromNode = buildRoutesFromTree(childNode, childSegment);
       childRoutes.push(...childRoutesFromNode);
     }
 
