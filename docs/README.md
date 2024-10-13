@@ -26,7 +26,7 @@ npm install -D vite
 ```plaintext
 src/
 ├── pages/
-│   ├── index.tsx          // '/' 경로에 해당
+│   ├── page.tsx          // '/' 경로에 해당
 │   ├── about/
 │   │   └── page.tsx       // '/about' 경로에 해당
 │   ├── blog/

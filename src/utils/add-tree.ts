@@ -13,7 +13,19 @@ export function addToRouteTree(
 ) {
   let current = tree;
 
-  segments.forEach((segment, index) => {
+  /** 루트 레이아웃인지 확인 */
+  const isRootLayout =
+    segments.length === 1 && (segments[0] === '/' || segments[0] === '');
+
+  /** 루트 레이아웃이면 트리의 최상위에 layoutElement를 설정 */
+  if (isRootLayout && nodeData.type === 'layout') {
+    tree.layoutElement = nodeData.element;
+    return;
+  }
+
+  for (let index = 0; index < segments.length; index++) {
+    let segment = segments[index];
+
     /** 동적 라우트 처리 */
     const isDynamic = segment.startsWith('[') && segment.endsWith(']');
     let segmentName = segment;
@@ -27,19 +39,28 @@ export function addToRouteTree(
       }
     }
 
-    /** 그룹 폴더는 경로에 포함되지 않으므로 빈 문자열로 처리 */
-    if (segmentName === '') {
-      segmentName = '';
+    /** 그룹 폴더 감지: 괄호로 감싸진 폴더 */
+    const isGroupFolder = segment.startsWith('(') && segment.endsWith(')');
+    if (isGroupFolder) {
+      continue;
     }
 
+    /** 빈 문자열 세그먼트는 무시 */
+    if (segmentName === '') {
+      continue;
+    }
+
+    /** 현재 노드에 children 객체가 없으면 초기화 */
     if (!current.children) {
       current.children = {};
     }
 
+    /** 세그먼트 이름으로 자식 노드가 없으면 생성 */
     if (!current.children[segmentName]) {
       current.children[segmentName] = {};
     }
 
+    /** 현재 노드를 자식 노드로 이동 */
     current = current.children[segmentName];
 
     /** 마지막 세그먼트인 경우 요소 할당 */
@@ -50,5 +71,5 @@ export function addToRouteTree(
         current.layoutElement = nodeData.element;
       }
     }
-  });
+  }
 }
