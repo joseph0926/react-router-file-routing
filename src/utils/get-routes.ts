@@ -32,6 +32,17 @@ export function getRoutes(): RouteObject[] {
    * ```
    */
   const layouts = import.meta.glob('/src/pages/**/layout.{jsx,tsx}');
+  /**
+   * pages 디렉토리의 error.tsx 파일을 모두 가져옵니다.
+   * @example
+   * ```js
+   * {
+   *  '/src/pages/home/error.tsx': () => import('/src/pages/home/error.tsx'),
+   *  '/src/pages/about/error.tsx': () => import('/src/pages/about/error.tsx'),
+   * }
+   * ```
+   */
+  const errors = import.meta.glob('/src/pages/**/error.{jsx,tsx}');
 
   /** 트리 구조를 생성하기 위한 루트 노드 */
   const routeTree: RouteNode = {};
@@ -57,6 +68,18 @@ export function getRoutes(): RouteObject[] {
       element,
     });
   });
+
+  /** 모든 error.tsx 파일을 순회하여 트리 구조에 추가 */
+  Object.keys(errors).forEach((filePath) => {
+    const pathSegments = getPathSegments(filePath);
+    const element = React.lazy(errors[filePath] as any);
+
+    addToRouteTree(routeTree, pathSegments, {
+      type: 'error',
+      element,
+    });
+  });
+
   /** 트리 구조를 기반으로 RouteObject 배열 생성 */
   const routeObjects = buildRoutesFromTree(routeTree);
 
