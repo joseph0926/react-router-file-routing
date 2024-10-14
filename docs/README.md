@@ -138,6 +138,28 @@ export default function DashboardLayout() {
 
 ---
 
+#### **4. 에러 지원**
+
+폴더 내에 `error.tsx` 파일을 추가하여 해당 경로에 **에러**에 대한 처리를 수행할 수 있습니다.<br/>
+자세한 내용은 [React Router의 errorElement](https://reactrouter.com/en/main/route/error-element)를 참고해주세요
+
+```tsx
+// src/pages/error.tsx
+import { useRouteError } from 'react-router-dom';
+
+export default function HomeError() {
+  const error = useRouteError();
+  console.log(error);
+
+  return (
+    <div style={styles.error}>
+      <h1>Home Page Error</h1>
+      <p>test</p>
+    </div>
+  );
+}
+```
+
 ### **📄 기여 방법**
 
 이 프로젝트에 기여하고 싶으시다면, 다음 절차를 따라주세요:

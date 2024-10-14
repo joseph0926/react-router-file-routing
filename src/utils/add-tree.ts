@@ -22,6 +22,11 @@ export function addToRouteTree(
     tree.layoutElement = nodeData.element;
     return;
   }
+  /** 루트 에러면 트리의 최상위에 errorElement를 설정 */
+  if (isRootLayout && nodeData.type === 'error') {
+    tree.errorElement = nodeData.element;
+    return;
+  }
 
   for (let index = 0; index < segments.length; index++) {
     let segment = segments[index];
@@ -69,6 +74,8 @@ export function addToRouteTree(
         current.pageElement = nodeData.element;
       } else if (nodeData.type === 'layout') {
         current.layoutElement = nodeData.element;
+      } else if (nodeData.type === 'error') {
+        current.errorElement = nodeData.element;
       }
     }
   }

@@ -138,6 +138,28 @@ You can define a group route (or pathless route) using `(folder-name)` format.
   - Folder: /pages/home/(auth)/layout.tsx,page.tsx
   - Path: "/home"
 
+#### **6. Error Support**
+
+You can add an `error.tsx` file inside the folder to perform processing for **errors** in that path.<br/>
+For more details, see [errorElement in React Router](https://reactrouter.com/en/main/route/error-element)
+
+```tsx
+// src/pages/error.tsx
+import { useRouteError } from 'react-router-dom';
+
+export default function HomeError() {
+  const error = useRouteError();
+  console.log(error);
+
+  return (
+    <div style={styles.error}>
+      <h1>Home Page Error</h1>
+      <p>test</p>
+    </div>
+  );
+}
+```
+
 ---
 
 ### **📄 How to Contribute**
@@ -170,3 +192,7 @@ This project is licensed under the [MIT License](LICENSE).
 If you have any questions or issues, feel free to contact me at:
 
 - **Email**: rkekqmf0926@gmail.com
+
+```
+
+```
