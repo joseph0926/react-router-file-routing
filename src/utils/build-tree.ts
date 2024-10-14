@@ -1,3 +1,4 @@
+// src/utils/build-tree.ts
 import { RouteObject } from 'react-router-dom';
 import { RouteNode } from '../types';
 import React from 'react';
@@ -10,7 +11,7 @@ import React from 'react';
  */
 export function buildRoutesFromTree(
   node: RouteNode,
-  parentPath = '',
+  parentPath: string = '',
 ): RouteObject[] {
   /** 루트 노드이고 레이아웃 요소가 있는 경우 */
   if (parentPath === '' && node.layoutElement) {
@@ -21,6 +22,14 @@ export function buildRoutesFromTree(
         { fallback: null },
         React.createElement(node.layoutElement),
       ),
+      errorElement: node.errorElement
+        ? React.createElement(
+            React.Suspense,
+            { fallback: null },
+            React.createElement(node.errorElement),
+          )
+        : undefined,
+
       children: [],
     };
 
@@ -37,6 +46,13 @@ export function buildRoutesFromTree(
       childRoutes.push({
         index: true,
         element: pageElement,
+        errorElement: node.errorElement
+          ? React.createElement(
+              React.Suspense,
+              { fallback: null },
+              React.createElement(node.errorElement),
+            )
+          : undefined,
       });
     }
 
@@ -85,6 +101,14 @@ export function buildRoutesFromTree(
       React.createElement(node.pageElement),
     );
 
+    const errorElement = node.errorElement
+      ? React.createElement(
+          React.Suspense,
+          { fallback: null },
+          React.createElement(node.errorElement),
+        )
+      : undefined;
+
     if (node.layoutElement) {
       /** 레이아웃이 있는 경우, 자식으로 인덱스 라우트 추가 */
       if (!route.children) {
@@ -93,10 +117,12 @@ export function buildRoutesFromTree(
       route.children.push({
         index: true,
         element: pageElement,
+        errorElement,
       });
     } else {
       /** 레이아웃이 없는 경우, 현재 라우트에 페이지 요소 설정 */
       route.element = pageElement;
+      route.errorElement = errorElement;
     }
   }
 

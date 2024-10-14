@@ -21,14 +21,19 @@ export function getPathSegments(filePath: string): string[] {
     .filter((segment) => segment !== '');
 
   /** 메인 진입점 처리 (`/pages/page.tsx` || `/pages/layout.tsx`) */
-  if (segments[0].startsWith('page.') || segments[0].startsWith('layout.')) {
+  if (
+    segments[0].startsWith('page.') ||
+    segments[0].startsWith('layout.') ||
+    segments[0].startsWith('error.')
+  ) {
     segments[0] = '/';
   }
 
   /** 파일 이름을 제거 */
   if (
     segments[segments.length - 1].startsWith('page.') ||
-    segments[segments.length - 1].startsWith('layout.')
+    segments[segments.length - 1].startsWith('layout.') ||
+    segments[segments.length - 1].startsWith('error.')
   ) {
     segments.pop();
   }
