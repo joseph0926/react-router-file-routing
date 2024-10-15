@@ -10,7 +10,8 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "lint": "eslint",
-    "format": "prettier --w 'src/**/*.{ts,tsx,js,jsx,json,css,md}'"
+    "format": "prettier --w 'src/**/*.{ts,tsx,js,jsx,json,css,md}'",
+    "build:p": "pnpm run build && npm publish"
   },
   "repository": {
     "type": "git",
