@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo } from 'react';
+import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { getRoutes } from './utils/get-routes';
 
@@ -14,13 +14,13 @@ export function FileRouter() {
   /**
    * 파일/폴더 정보를 읽은 후 해당 라우터 정보를 모두 가져옵니다
    */
-  const routes = useMemo(() => getRoutes(), []);
+  const routes = React.useMemo(() => getRoutes(), []);
 
-  const router = useMemo(() => createBrowserRouter(routes), [routes]);
+  const router = React.useMemo(() => createBrowserRouter(routes), [routes]);
 
   return (
-    <Suspense fallback={<div>Loading,,,</div>}>
+    <React.Suspense fallback={<div>Loading,,,</div>}>
       <RouterProvider router={router} />
-    </Suspense>
+    </React.Suspense>
   );
 }
