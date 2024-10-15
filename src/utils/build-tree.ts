@@ -1,62 +1,39 @@
-// src/utils/build-tree.ts
 import { RouteObject } from 'react-router-dom';
 import { RouteNode } from '../types';
+import { createRouteObject } from './create-route-object';
+import { wrapWithSuspense } from './suspens-wrapper';
 import React from 'react';
 
 /**
- * 트리구조를 라우터 형태로 변경하는 함수
- * @param node
- * @param parentPath
- * @returns
+ * 트리 구조를 route object로 변경하는 함수
+ * @param node - RouteNode
+ * @param parentPath - 상위 path
+ * @returns RouteObject[]
  */
 export function buildRoutesFromTree(
   node: RouteNode,
   parentPath: string = '',
 ): RouteObject[] {
-  /** 루트 노드이고 레이아웃 요소가 있는 경우 */
+  /** 최상위 루트에 layout이 존재하는 경우 */
   if (parentPath === '' && node.layoutElement) {
-    const rootRoute: RouteObject = {
-      path: '/',
-      element: React.createElement(
-        React.Suspense,
-        { fallback: null },
-        React.createElement(node.layoutElement),
-      ),
-      errorElement: node.errorElement
-        ? React.createElement(
-            React.Suspense,
-            { fallback: null },
-            React.createElement(node.errorElement),
-          )
-        : undefined,
-
-      children: [],
-    };
+    const rootRoute: RouteObject = createRouteObject(node, '/');
 
     const childRoutes: RouteObject[] = [];
 
-    /** 루트 노드에 페이지 요소가 있는 경우 인덱스 라우트로 추가 */
-    if (node.pageElement) {
-      const pageElement = React.createElement(
-        React.Suspense,
-        { fallback: null },
-        React.createElement(node.pageElement),
-      );
+    const loadingComponent = node.loadingElement
+      ? React.createElement(node.loadingElement)
+      : undefined;
 
+    if (node.pageElement) {
       childRoutes.push({
         index: true,
-        element: pageElement,
+        element: wrapWithSuspense(node.pageElement, loadingComponent),
         errorElement: node.errorElement
-          ? React.createElement(
-              React.Suspense,
-              { fallback: null },
-              React.createElement(node.errorElement),
-            )
+          ? wrapWithSuspense(node.errorElement)
           : undefined,
       });
     }
 
-    /** 자식 노드를 재귀적으로 처리 */
     if (node.children) {
       for (const childSegment in node.children) {
         const childNode = node.children[childSegment];
@@ -68,65 +45,13 @@ export function buildRoutesFromTree(
       }
     }
 
-    /** 자식 라우트를 루트 라우트의 children에 추가 */
     rootRoute.children = childRoutes;
-
-    /** 루트 라우트만 반환하여 모든 경로에 루트 레이아웃이 적용되도록 함 */
     return [rootRoute];
   }
 
   const routes: RouteObject[] = [];
+  const route = createRouteObject(node, parentPath || undefined);
 
-  const route: RouteObject = {};
-
-  /** 현재 노드의 경로 설정 */
-  if (parentPath !== '') {
-    route.path = parentPath;
-  }
-
-  /** 레이아웃 요소 설정 */
-  if (node.layoutElement) {
-    route.element = React.createElement(
-      React.Suspense,
-      { fallback: null },
-      React.createElement(node.layoutElement),
-    );
-  }
-
-  /** 페이지 요소 설정 (레이아웃과 함께 있을 때는 인덱스 라우트로 추가) */
-  if (node.pageElement) {
-    const pageElement = React.createElement(
-      React.Suspense,
-      { fallback: null },
-      React.createElement(node.pageElement),
-    );
-
-    const errorElement = node.errorElement
-      ? React.createElement(
-          React.Suspense,
-          { fallback: null },
-          React.createElement(node.errorElement),
-        )
-      : undefined;
-
-    if (node.layoutElement) {
-      /** 레이아웃이 있는 경우, 자식으로 인덱스 라우트 추가 */
-      if (!route.children) {
-        route.children = [];
-      }
-      route.children.push({
-        index: true,
-        element: pageElement,
-        errorElement,
-      });
-    } else {
-      /** 레이아웃이 없는 경우, 현재 라우트에 페이지 요소 설정 */
-      route.element = pageElement;
-      route.errorElement = errorElement;
-    }
-  }
-
-  /** 자식 노드 처리 */
   if (node.children) {
     const childRoutes: RouteObject[] = [];
 
@@ -137,18 +62,13 @@ export function buildRoutesFromTree(
     }
 
     if (node.layoutElement) {
-      /** 레이아웃이 있는 경우, 자식 라우트를 route.children에 추가 */
-      if (!route.children) {
-        route.children = [];
-      }
+      route.children = route.children || [];
       route.children.push(...childRoutes);
     } else {
-      /** 레이아웃이 없는 경우, 현재 라우트의 자식으로 추가 */
       routes.push(...childRoutes);
     }
   }
 
   routes.push(route);
-
   return routes;
 }
