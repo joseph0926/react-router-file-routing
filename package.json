@@ -1,6 +1,6 @@
 {
   "name": "react-router-file-routing",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A library to support folder-based routing of next.js to react-router-dom",
   "main": "dist/index.js",
   "files": [
