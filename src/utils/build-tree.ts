@@ -2,6 +2,7 @@ import { RouteObject } from 'react-router-dom';
 import { RouteNode } from '../types';
 import { createRouteObject } from './create-route-object';
 import { wrapWithSuspense } from './suspens-wrapper';
+import React from 'react';
 
 /**
  * 트리 구조를 route object로 변경하는 함수
@@ -19,10 +20,14 @@ export function buildRoutesFromTree(
 
     const childRoutes: RouteObject[] = [];
 
+    const loadingComponent = node.loadingElement
+      ? React.createElement(node.loadingElement)
+      : undefined;
+
     if (node.pageElement) {
       childRoutes.push({
         index: true,
-        element: wrapWithSuspense(node.pageElement),
+        element: wrapWithSuspense(node.pageElement, loadingComponent),
         errorElement: node.errorElement
           ? wrapWithSuspense(node.errorElement)
           : undefined,
