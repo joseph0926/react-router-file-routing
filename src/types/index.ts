@@ -9,11 +9,13 @@ export type RouteNode = {
   pageElement?: React.LazyExoticComponent<any>;
   /** error component */
   errorElement?: React.LazyExoticComponent<any>;
+  /** loading component */
+  loadingElement?: React.LazyExoticComponent<any>;
   /** children 라우트 */
   children?: Record<string, RouteNode>;
 };
 
 export type NodeData = {
-  type: 'page' | 'layout' | 'error';
+  type: 'page' | 'layout' | 'error' | 'loading';
   element: React.LazyExoticComponent<any>;
 };
