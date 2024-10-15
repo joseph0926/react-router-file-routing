@@ -152,9 +152,26 @@ export default function HomeError() {
   console.log(error);
 
   return (
-    <div style={styles.error}>
+    <div className={styles.error}>
       <h1>Home Page Error</h1>
       <p>test</p>
+    </div>
+  );
+}
+```
+
+#### **7. Loading Support**
+
+You can add a `loading.tsx` file inside the folder to handle **loading** to that path.<br/>
+For more information, see [Suspense fallback in React](https://react.dev/reference/react/Suspense#suspense)
+
+```tsx
+// src/pages/loading.tsx
+export default function HomeLoading() {
+  return (
+    <div className={styles.wrapper}>
+      <h1>Home Page Title</h1>
+      <div className={styles.spinner} />
     </div>
   );
 }

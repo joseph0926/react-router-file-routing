@@ -138,7 +138,7 @@ export default function DashboardLayout() {
 
 ---
 
-#### **4. 에러 지원**
+#### **6. 에러 지원**
 
 폴더 내에 `error.tsx` 파일을 추가하여 해당 경로에 **에러**에 대한 처리를 수행할 수 있습니다.<br/>
 자세한 내용은 [React Router의 errorElement](https://reactrouter.com/en/main/route/error-element)를 참고해주세요
@@ -152,9 +152,26 @@ export default function HomeError() {
   console.log(error);
 
   return (
-    <div style={styles.error}>
+    <div className={styles.error}>
       <h1>Home Page Error</h1>
       <p>test</p>
+    </div>
+  );
+}
+```
+
+#### **7. 로딩 지원**
+
+폴더 내에 `loading.tsx` 파일을 추가하여 해당 경로에 **로딩**에 대한 처리를 수행할 수 있습니다.<br/>
+자세한 내용은 [React의 Suspense fallback](https://react.dev/reference/react/Suspense#suspense)을 참고해주세요
+
+```tsx
+// src/pages/loading.tsx
+export default function HomeLoading() {
+  return (
+    <div className={styles.wrapper}>
+      <h1>Home Page Title</h1>
+      <div className={styles.spinner} />
     </div>
   );
 }
