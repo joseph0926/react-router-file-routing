@@ -30,6 +30,11 @@ export function createRouteObject(node: RouteNode, path?: string): RouteObject {
     route.errorElement = wrapWithSuspense(node.errorElement, loadingComponent);
   }
 
+  /** loader 처리 */
+  if (node.loaderFn) {
+    route.loader = node.loaderFn;
+  }
+
   /** page 처리 */
   if (node.pageElement) {
     const pageElement = wrapWithSuspense(node.pageElement, loadingComponent);
@@ -40,6 +45,7 @@ export function createRouteObject(node: RouteNode, path?: string): RouteObject {
           index: true,
           element: pageElement,
           errorElement: route.errorElement,
+          loader: route.loader,
         },
       ];
     } else {

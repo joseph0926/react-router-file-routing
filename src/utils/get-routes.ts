@@ -1,5 +1,9 @@
 import React from 'react';
-import { RouteObject } from 'react-router-dom';
+import {
+  LoaderFunction,
+  LoaderFunctionArgs,
+  RouteObject,
+} from 'react-router-dom';
 import { sortRoutes } from './sort-routes';
 import { RouteNode } from '../types';
 import { getPathSegments } from './get-path-segments';
@@ -26,6 +30,10 @@ export function getRoutes(): RouteObject[] {
    * pages 디렉토리의 loading.tsx 파일을 모두 가져옵니다.
    */
   const loadings = import.meta.glob('/src/pages/**/loading.{jsx,tsx}');
+  /**
+   * pages 디렉토리의 loader.ts 파일을 모두 가져옵니다.
+   */
+  const loaders = import.meta.glob('/src/pages/**/loader.{js,ts}');
 
   /** 트리 구조를 생성하기 위한 루트 노드 */
   const routeTree: RouteNode = {};
@@ -33,11 +41,30 @@ export function getRoutes(): RouteObject[] {
   /** 모든 {page | layout | error | loading} 파일을 순회하여 트리 구조에 추가합니다 */
   const addElementsToTree = (
     glob: Record<string, () => Promise<unknown>>,
-    type: 'page' | 'layout' | 'error' | 'loading',
+    type: 'page' | 'layout' | 'error' | 'loading' | 'loader',
   ) => {
     Object.keys(glob).forEach((filePath) => {
       const pathSegments = getPathSegments(filePath);
-      const element = React.lazy(glob[filePath] as any);
+
+      let element:
+        | React.LazyExoticComponent<React.ComponentType<any>>
+        | LoaderFunction;
+
+      if (type === 'loader') {
+        const moduleLoader = glob[filePath] as () => Promise<{
+          default: LoaderFunction;
+        }>;
+        element = async (args: LoaderFunctionArgs<any>) => {
+          const module = await moduleLoader();
+          return module.default(args);
+        };
+      } else {
+        element = React.lazy(
+          glob[filePath] as unknown as () => Promise<{
+            default: React.ComponentType<any>;
+          }>,
+        );
+      }
 
       addToRouteTree(routeTree, pathSegments, {
         type,
@@ -50,6 +77,7 @@ export function getRoutes(): RouteObject[] {
   addElementsToTree(layouts, 'layout');
   addElementsToTree(errors, 'error');
   addElementsToTree(loadings, 'loading');
+  addElementsToTree(loaders, 'loader');
 
   /** 트리 구조를 기반으로 RouteObject 배열 생성 */
   const routeObjects = buildRoutesFromTree(routeTree);

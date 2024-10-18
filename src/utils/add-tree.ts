@@ -1,3 +1,4 @@
+import { LoaderFunction } from 'react-router-dom';
 import { NodeData, RouteNode } from '../types';
 
 /**
@@ -19,17 +20,28 @@ export function addToRouteTree(
 
   /** 루트 레이아웃이면 트리의 최상위에 layoutElement를 설정 */
   if (isRootLayout && nodeData.type === 'layout') {
-    tree.layoutElement = nodeData.element;
+    tree.layoutElement = nodeData.element as React.LazyExoticComponent<
+      React.ComponentType<any>
+    >;
     return;
   }
   /** 루트 에러면 트리의 최상위에 errorElement를 설정 */
   if (isRootLayout && nodeData.type === 'error') {
-    tree.errorElement = nodeData.element;
+    tree.errorElement = nodeData.element as React.LazyExoticComponent<
+      React.ComponentType<any>
+    >;
     return;
   }
   /** 루트 로딩이면 트리의 최상위에 loadingElement를 설정 */
   if (isRootLayout && nodeData.type === 'loading') {
-    tree.loadingElement = nodeData.element;
+    tree.loadingElement = nodeData.element as React.LazyExoticComponent<
+      React.ComponentType<any>
+    >;
+    return;
+  }
+  /** 루트 loader면 트리의 최상위에 loaderFn를 설정 */
+  if (isRootLayout && nodeData.type === 'loader') {
+    tree.loaderFn = nodeData.element as LoaderFunction;
     return;
   }
 
@@ -75,14 +87,31 @@ export function addToRouteTree(
 
     /** 마지막 세그먼트인 경우 요소 할당 */
     if (index === segments.length - 1) {
-      if (nodeData.type === 'page') {
-        current.pageElement = nodeData.element;
-      } else if (nodeData.type === 'layout') {
-        current.layoutElement = nodeData.element;
-      } else if (nodeData.type === 'error') {
-        current.errorElement = nodeData.element;
-      } else if (nodeData.type === 'loading') {
-        current.loadingElement = nodeData.element;
+      switch (nodeData.type) {
+        case 'page':
+          current.pageElement = nodeData.element as React.LazyExoticComponent<
+            React.ComponentType<any>
+          >;
+          break;
+        case 'layout':
+          current.layoutElement = nodeData.element as React.LazyExoticComponent<
+            React.ComponentType<any>
+          >;
+          break;
+        case 'error':
+          current.errorElement = nodeData.element as React.LazyExoticComponent<
+            React.ComponentType<any>
+          >;
+          break;
+        case 'loading':
+          current.loadingElement =
+            nodeData.element as React.LazyExoticComponent<
+              React.ComponentType<any>
+            >;
+          break;
+        case 'loader':
+          current.loaderFn = nodeData.element as LoaderFunction;
+          break;
       }
     }
   }

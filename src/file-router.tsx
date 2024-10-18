@@ -18,9 +18,5 @@ export function FileRouter() {
 
   const router = React.useMemo(() => createBrowserRouter(routes), [routes]);
 
-  return (
-    <React.Suspense fallback={<div>Loading,,,</div>}>
-      <RouterProvider router={router} />
-    </React.Suspense>
-  );
+  return <RouterProvider router={router} />;
 }

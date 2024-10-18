@@ -177,6 +177,23 @@ export default function HomeLoading() {
 }
 ```
 
+#### **7. loader 지원**
+
+폴더 내에 `loader.ts` 파일을 추가하여 해당 경로에 **loader**에 대한 처리를 수행할 수 있습니다.<br/>
+자세한 내용은 [React Router의 loader](https://reactrouter.com/en/main/route/loader)를 참고해주세요
+
+```tsx
+// src/pages/loader.ts
+export default async function rootLoader() {
+  const res = await fetch('https://swapi.dev/api/people');
+
+  return await res.json();
+}
+
+// src/pages/layout.tsx
+const data = useLoaderData();
+```
+
 ### **📄 기여 방법**
 
 이 프로젝트에 기여하고 싶으시다면, 다음 절차를 따라주세요:
