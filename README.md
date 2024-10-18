@@ -177,6 +177,23 @@ export default function HomeLoading() {
 }
 ```
 
+#### **7. Loader Support**
+
+You can add a `loader.ts` file inside the folder to handle **loader** to that path.<br/>
+For more information, see [Loader in React Router](https://reactrouter.com/en/main/route/loader)
+
+```tsx
+// src/pages/loader.ts
+export default async function rootLoader() {
+  const res = await fetch('https://swapi.dev/api/people');
+
+  return await res.json();
+}
+
+// src/pages/layout.tsx
+const data = useLoaderData();
+```
+
 ---
 
 ### **📄 How to Contribute**
