@@ -25,7 +25,8 @@ export function getPathSegments(filePath: string): string[] {
     segments[0].startsWith('page.') ||
     segments[0].startsWith('layout.') ||
     segments[0].startsWith('error.') ||
-    segments[0].startsWith('loading.')
+    segments[0].startsWith('loading.') ||
+    segments[0].startsWith('loader.')
   ) {
     segments[0] = '/';
   }
@@ -35,7 +36,8 @@ export function getPathSegments(filePath: string): string[] {
     segments[segments.length - 1].startsWith('page.') ||
     segments[segments.length - 1].startsWith('layout.') ||
     segments[segments.length - 1].startsWith('error.') ||
-    segments[segments.length - 1].startsWith('loading.')
+    segments[segments.length - 1].startsWith('loading.') ||
+    segments[segments.length - 1].startsWith('loader.')
   ) {
     segments.pop();
   }

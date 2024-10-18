@@ -24,6 +24,8 @@ export function buildRoutesFromTree(
       ? React.createElement(node.loadingElement)
       : undefined;
 
+    const loaderFn = node.loaderFn ? node.loaderFn : undefined;
+
     if (node.pageElement) {
       childRoutes.push({
         index: true,
@@ -31,6 +33,7 @@ export function buildRoutesFromTree(
         errorElement: node.errorElement
           ? wrapWithSuspense(node.errorElement)
           : undefined,
+        loader: loaderFn,
       });
     }
 
